@@ -1,0 +1,23 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Globe -->
+  <circle cx="256" cy="280" r="180" fill="none" stroke="#0055FF" stroke-width="8"/>
+  
+  <!-- Continents (simplified) -->
+  <path d="M 180 240 Q 200 230 220 240 Q 210 260 190 270 Z" fill="#0055FF"/>
+  <path d="M 240 200 Q 280 190 300 220 Q 290 260 260 270 Z" fill="#00D9FF"/>
+  <path d="M 320 240 Q 360 230 380 260 Q 360 290 330 280 Z" fill="#0055FF"/>
+  <path d="M 200 300 Q 240 320 280 310 Q 260 340 220 330 Z" fill="#00D9FF"/>
+  
+  <!-- Orbit ring -->
+  <ellipse cx="256" cy="280" rx="200" ry="80" fill="none" stroke="#00D9FF" stroke-width="6" opacity="0.6"/>
+  
+  <!-- Airplane -->
+  <g transform="translate(420, 140)">
+    <!-- Airplane body -->
+    <ellipse cx="0" cy="0" rx="25" ry="12" fill="#00D9FF" stroke="#0055FF" stroke-width="2"/>
+    <!-- Wings -->
+    <rect x="-30" y="-4" width="60" height="8" fill="#00D9FF" stroke="#0055FF" stroke-width="1.5"/>
+    <!-- Tail -->
+    <polygon points="20,-8 20,8 35,0" fill="#00D9FF" stroke="#0055FF" stroke-width="1.5"/>
+  </g>
+</svg>

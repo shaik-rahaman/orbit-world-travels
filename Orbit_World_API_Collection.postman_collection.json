@@ -1,0 +1,1235 @@
+{
+  "info": {
+    "_postman_id": "orbit-world-collection",
+    "name": "Orbit World Backend API",
+    "description": "Complete API collection for Orbit World - Travel Operations & Invoicing Platform with AI capabilities",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('jwt_token', pm.response.json().data.token);",
+                  "    console.log('User registered and token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"Password@123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const token = pm.response.json().data.token;",
+                  "    pm.environment.set('jwt_token', token);",
+                  "    pm.environment.set('userId', pm.response.json().data.user._id);",
+                  "    console.log('Login successful - Token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@orbittravels.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Get All Users (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/users?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Invoices",
+      "item": [
+        {
+          "name": "Create Invoice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('invoiceId', pm.response.json().data._id);",
+                  "    console.log('Invoice created: ' + pm.response.json().data.invoiceNumber);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": \"{{clientId}}\",\n  \"vendorCost\": 5000,\n  \"customerAmount\": 7500,\n  \"description\": \"Flight booking for client ABC\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/invoices",
+              "host": ["{{base_url}}"],
+              "path": ["invoices"]
+            }
+          }
+        },
+        {
+          "name": "Get All Invoices (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/invoices?page=1&limit=10&financialYear=2025-26",
+              "host": ["{{base_url}}"],
+              "path": ["invoices"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "financialYear",
+                  "value": "2025-26"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Invoice by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/invoices/{{invoiceId}}",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "{{invoiceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Add Invoice Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"moduleType\": \"FLIGHT\",\n  \"moduleRecordId\": \"{{flightId}}\",\n  \"amount\": 7500\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/invoices/{{invoiceId}}/items",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "{{invoiceId}}", "items"]
+            }
+          }
+        },
+        {
+          "name": "Remove Invoice Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/invoices/{{invoiceId}}/items/{{itemId}}",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "{{invoiceId}}", "items", "{{itemId}}"]
+            }
+          }
+        },
+        {
+          "name": "Finalize Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/invoices/{{invoiceId}}/finalize",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "{{invoiceId}}", "finalize"]
+            }
+          }
+        },
+        {
+          "name": "Delete Invoice",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/invoices/{{invoiceId}}",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "{{invoiceId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛫 Flights",
+      "item": [
+        {
+          "name": "Create Flight",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('flightId', pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pnr\": \"ABC123DEF\",\n  \"passengerName\": \"John Doe\",\n  \"passengerEmail\": \"john@example.com\",\n  \"airline\": \"Emirates\",\n  \"flightNumber\": \"EK201\",\n  \"sector\": \"NYC-DXB\",\n  \"departureDate\": \"2024-02-15T14:30:00Z\",\n  \"returnDate\": \"2024-02-22T16:45:00Z\",\n  \"seatClass\": \"ECONOMY\",\n  \"cost\": 500,\n  \"sellingPrice\": 750,\n  \"clientId\": \"{{clientId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/flight",
+              "host": ["{{base_url}}"],
+              "path": ["flight"]
+            }
+          }
+        },
+        {
+          "name": "Get All Flights",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/flight?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["flight"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Flight by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/flight/{{flightId}}",
+              "host": ["{{base_url}}"],
+              "path": ["flight", "{{flightId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Flight",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passengerName\": \"Jane Doe\",\n  \"seatClass\": \"BUSINESS\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/flight/{{flightId}}",
+              "host": ["{{base_url}}"],
+              "path": ["flight", "{{flightId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Flight",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/flight/{{flightId}}",
+              "host": ["{{base_url}}"],
+              "path": ["flight", "{{flightId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏨 Hotels",
+      "item": [
+        {
+          "name": "Create Hotel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('hotelId', pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guestName\": \"Emma Brown\",\n  \"guestEmail\": \"emma@example.com\",\n  \"hotelName\": \"Grand Plaza Hotel\",\n  \"city\": \"Dubai\",\n  \"roomType\": \"Deluxe\",\n  \"checkInDate\": \"2024-02-15T14:00:00Z\",\n  \"checkOutDate\": \"2024-02-22T11:00:00Z\",\n  \"noOfNights\": 7,\n  \"cost\": 600,\n  \"sellingPrice\": 900,\n  \"clientId\": \"{{clientId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/hotel",
+              "host": ["{{base_url}}"],
+              "path": ["hotel"]
+            }
+          }
+        },
+        {
+          "name": "Get All Hotels",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotel?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["hotel"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Hotel by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotel/{{hotelId}}",
+              "host": ["{{base_url}}"],
+              "path": ["hotel", "{{hotelId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Hotel",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomType\": \"Suite\",\n  \"cost\": 700\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/hotel/{{hotelId}}",
+              "host": ["{{base_url}}"],
+              "path": ["hotel", "{{hotelId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Hotel",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/hotel/{{hotelId}}",
+              "host": ["{{base_url}}"],
+              "path": ["hotel", "{{hotelId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛂 Visas",
+      "item": [
+        {
+          "name": "Create Visa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('visaId', pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"applicantName\": \"Sarah Johnson\",\n  \"applicantEmail\": \"sarah@example.com\",\n  \"gender\": \"FEMALE\",\n  \"dateOfBirth\": \"1990-05-15T00:00:00Z\",\n  \"passportNumber\": \"US123456789\",\n  \"visaType\": \"Tourist\",\n  \"country\": \"India\",\n  \"cost\": 100,\n  \"sellingPrice\": 150,\n  \"clientId\": \"{{clientId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/visa",
+              "host": ["{{base_url}}"],
+              "path": ["visa"]
+            }
+          }
+        },
+        {
+          "name": "Get All Visas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/visa?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["visa"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Visa by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/visa/{{visaId}}",
+              "host": ["{{base_url}}"],
+              "path": ["visa", "{{visaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Visa",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"approvalDate\": \"2024-01-25T00:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/visa/{{visaId}}",
+              "host": ["{{base_url}}"],
+              "path": ["visa", "{{visaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Visa",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/visa/{{visaId}}",
+              "host": ["{{base_url}}"],
+              "path": ["visa", "{{visaId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛡️ Insurance",
+      "item": [
+        {
+          "name": "Create Insurance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('insuranceId', pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"policyNumber\": \"INS-2024-001\",\n  \"holderName\": \"Michael Davis\",\n  \"holderEmail\": \"michael@example.com\",\n  \"insuranceType\": \"Travel\",\n  \"coverageAmount\": 100000,\n  \"duration\": 14,\n  \"cost\": 50,\n  \"sellingPrice\": 75,\n  \"clientId\": \"{{clientId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/insurance",
+              "host": ["{{base_url}}"],
+              "path": ["insurance"]
+            }
+          }
+        },
+        {
+          "name": "Get All Insurance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/insurance?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["insurance"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Insurance by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/insurance/{{insuranceId}}",
+              "host": ["{{base_url}}"],
+              "path": ["insurance", "{{insuranceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Insurance",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"coverageAmount\": 120000,\n  \"duration\": 21\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/insurance/{{insuranceId}}",
+              "host": ["{{base_url}}"],
+              "path": ["insurance", "{{insuranceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Insurance",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/insurance/{{insuranceId}}",
+              "host": ["{{base_url}}"],
+              "path": ["insurance", "{{insuranceId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 CRM / Clients",
+      "item": [
+        {
+          "name": "Create Client",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('clientId', pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"ABC Travel Solutions\",\n  \"email\": \"contact@abctravel.com\",\n  \"phone\": \"+1-800-123-4567\",\n  \"address\": \"123 Business Ave\",\n  \"city\": \"New York\",\n  \"country\": \"USA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/clients",
+              "host": ["{{base_url}}"],
+              "path": ["clients"]
+            }
+          }
+        },
+        {
+          "name": "Get All Clients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clients?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["clients"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Client by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clients/{{clientId}}",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "{{clientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Client",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newemail@abctravel.com\",\n  \"phone\": \"+1-800-999-8888\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/clients/{{clientId}}",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "{{clientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Client",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clients/{{clientId}}",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "{{clientId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Reports & Analytics",
+      "item": [
+        {
+          "name": "Sales Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/sales?startDate=2024-01-01&endDate=2024-01-31",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "sales"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Profit Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/profit?startDate=2024-01-01&endDate=2024-01-31",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "profit"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Module-wise Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/module-wise",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "module-wise"]
+            }
+          }
+        },
+        {
+          "name": "Staff Performance Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/staff-performance",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "staff-performance"]
+            }
+          }
+        },
+        {
+          "name": "GST Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/gst?month=01&year=2024",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "gst"],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "01"
+                },
+                {
+                  "key": "year",
+                  "value": "2024"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dashboard KPIs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "dashboard"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤖 AI Features",
+      "item": [
+        {
+          "name": "Extract Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/document.pdf"
+                },
+                {
+                  "key": "moduleType",
+                  "value": "FLIGHT",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/extract",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "extract"]
+            }
+          }
+        },
+        {
+          "name": "Chat Query",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Show total profit this month\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/chat",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "chat"]
+            }
+          }
+        },
+        {
+          "name": "Get Chat Examples",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ai/chat/examples",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "chat", "examples"]
+            }
+          }
+        },
+        {
+          "name": "Get Available Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ai/chat/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "chat", "metrics"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set base URL if not already set",
+          "if (!pm.environment.get('base_url')) {",
+          "    pm.environment.set('base_url', 'http://localhost:3000/api/orbit-world');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/orbit-world",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clientId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invoiceId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "flightId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "hotelId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "visaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "insuranceId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "itemId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
