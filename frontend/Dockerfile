@@ -3,9 +3,15 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# Build arguments for environment configuration
+# Local: http://localhost:3008/api/orbit-world
+# Production (Azure): https://orbit-world-backend-eyd5b5egezgqgjep.southindia-01.azurewebsites.net/api/orbit-world
 ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:3008/api/orbit-world
+ARG NEXT_PUBLIC_ENVIRONMENT=development
 
+# Set environment variables for build
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_ENVIRONMENT=$NEXT_PUBLIC_ENVIRONMENT
 
 # Copy package files
 COPY package*.json ./
@@ -21,6 +27,7 @@ RUN npm ci
 COPY public ./public
 COPY app ./app
 COPY components ./components
+COPY config ./config
 COPY constants ./constants
 COPY hooks ./hooks
 COPY services ./services
@@ -37,6 +44,14 @@ FROM node:18-alpine
 WORKDIR /app
 
 ENV NODE_ENV=production
+
+# Build arguments to pass runtime environment
+ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:3008/api/orbit-world
+ARG NEXT_PUBLIC_ENVIRONMENT=production
+
+# Set environment variables for runtime
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_ENVIRONMENT=$NEXT_PUBLIC_ENVIRONMENT
 
 # Copy package files
 COPY package*.json ./
