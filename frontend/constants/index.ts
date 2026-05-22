@@ -1,4 +1,6 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3008/api/orbit-world';
+import { API_BASE_URL } from '@/config/api';
+
+export { API_BASE_URL };
 
 export const MODULES = [
   { id: 'invoice', name: 'Invoices', path: '/modules/invoice', icon: 'FileText' },

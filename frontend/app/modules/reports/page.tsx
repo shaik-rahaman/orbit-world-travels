@@ -9,50 +9,43 @@ import { useProfitReport, useModuleWiseReport, useSalesReport, useDashboardStats
 import { useClients } from '@/hooks/useApi';
 import { formatCurrency } from '@/utils/helpers';
 
+
 function ReportsContent() {
   const financialYear = new Date().getFullYear();
 
   // Fetch real data from API
-  const { data: dashboardStatsData, isPending: isLoadingStats } = useDashboardStats(financialYear);
-  const { data: profitReportData, isPending: isLoadingProfit } = useProfitReport(financialYear);
-  const { data: moduleWiseData, isPending: isLoadingModules } = useModuleWiseReport(financialYear);
-  const { data: salesReportData, isPending: isLoadingSales } = useSalesReport(financialYear);
-  const { data: clientsData } = useClients(1, 1000);
+  const { data: dashboardStatsData, isPending: isLoadingStats, error: dashboardError } = useDashboardStats(financialYear);
+  const { data: profitReportData, isPending: isLoadingProfit, error: profitError } = useProfitReport(financialYear);
+  const { data: moduleWiseData, isPending: isLoadingModules, error: moduleError } = useModuleWiseReport(financialYear);
+  const { data: salesReportData, isPending: isLoadingSales, error: salesError } = useSalesReport(financialYear);
+  const { data: clientsData, error: clientsError } = useClients(1, 1000);
 
-  // Calculate metrics
+  // Use backend dashboard stats for KPIs
   const metrics = useMemo(() => {
     const stats = dashboardStatsData?.data?.data || {};
-    const clients = clientsData?.data?.data || [];
-
     const totalRevenue = Number(stats.totalRevenue) || 0;
     const totalProfit = Number(stats.totalProfit) || 0;
-    const totalInvoices = Number(stats.finalizedInvoices) || 1;
-    const totalClients = clients.length || 0;
-
-    // Prevent division by zero
-    const profitMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : '0';
+    const totalInvoices = Number(stats.totalInvoices) || 0;
+    const profitMargin = totalRevenue > 0 ? Math.round((totalProfit / totalRevenue) * 100) : 0;
     const avgOrderValue = totalInvoices > 0 ? totalRevenue / totalInvoices : 0;
-
+    const totalClients = Array.isArray(clientsData?.data?.data) ? clientsData.data.data.length : 0;
     return {
-      totalRevenue: Math.max(0, totalRevenue),
-      totalProfit: Math.max(0, totalProfit),
-      profitMargin: parseFloat(profitMargin),
+      totalRevenue,
+      totalProfit,
+      profitMargin,
       totalClients,
-      avgOrderValue: Math.max(0, avgOrderValue),
+      avgOrderValue,
+      totalInvoices,
     };
   }, [dashboardStatsData, clientsData]);
 
   // Process module-wise data for pie chart
   const moduleData = useMemo(() => {
     const modules = moduleWiseData?.data?.data || [];
-    
-    // Calculate total count
-    const totalCount = Array.isArray(modules) 
-      ? modules.reduce((sum: number, m: any) => sum + (m.count || m._count || 0), 0) 
+    const totalCount = Array.isArray(modules)
+      ? modules.reduce((sum: number, m: any) => sum + (m.count || m._count || 0), 0)
       : 0;
-    
-    // Convert to percentages
-    return Array.isArray(modules) 
+    return Array.isArray(modules)
       ? modules.map((m: any) => ({
           name: (m.module || m._id || 'Unknown').charAt(0).toUpperCase() + (m.module || m._id || 'Unknown').slice(1),
           value: totalCount > 0 ? Math.round(((m.count || m._count || 0) / totalCount) * 100) : 0,
@@ -63,39 +56,45 @@ function ReportsContent() {
 
   // Process sales data for charts
   const chartData = useMemo(() => {
-    // Extract arrays from nested response structure
-    const sales = salesReportData?.data?.data?.data || salesReportData?.data?.data || [];
-    const profitData = profitReportData?.data?.data?.data || profitReportData?.data?.data || [];
-    
-    // Group by month
+    const sales = salesReportData?.data?.data || [];
+    const profitData = profitReportData?.data?.data || [];
     const monthlyData: any = {};
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
     if (Array.isArray(sales)) {
       sales.forEach((invoice: any) => {
         const date = new Date(invoice.createdAt);
         const month = monthNames[date.getMonth()];
-        
         if (!monthlyData[month]) {
           monthlyData[month] = { month, sales: 0, profit: 0 };
         }
         monthlyData[month].sales += Number(invoice.totalCustomerAmount) || 0;
       });
     }
-
     if (Array.isArray(profitData)) {
       profitData.forEach((invoice: any) => {
         const date = new Date(invoice.createdAt);
         const month = monthNames[date.getMonth()];
-        
         if (monthlyData[month]) {
           monthlyData[month].profit += Number(invoice.totalMargin) || 0;
         }
       });
     }
-
     return Object.values(monthlyData).slice(-6); // Last 6 months
   }, [salesReportData, profitReportData]);
+
+  // Error handling
+  if (dashboardError || profitError || moduleError || salesError || clientsError) {
+    return (
+      <div className="p-6 text-red-600 bg-red-50 rounded-lg">
+        Error loading reports data. Please try again later.<br />
+        {dashboardError && <div>Dashboard: {dashboardError.message}</div>}
+        {profitError && <div>Profit: {profitError.message}</div>}
+        {moduleError && <div>Modules: {moduleError.message}</div>}
+        {salesError && <div>Sales: {salesError.message}</div>}
+        {clientsError && <div>Clients: {clientsError.message}</div>}
+      </div>
+    );
+  }
 
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
 

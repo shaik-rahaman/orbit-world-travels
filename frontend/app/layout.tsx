@@ -31,6 +31,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
+        <footer className="w-full mt-auto py-4 px-4 text-center text-xs text-gray-500 bg-gradient-to-r from-indigo-50 via-purple-50 to-blue-50 dark:from-indigo-950 dark:via-purple-950 dark:to-blue-950 border-t border-gray-200 dark:border-gray-800 transition-colors">
+          © 2026 Orbit World Technologies. All rights reserved.
+        </footer>
       </body>
     </html>
   );

@@ -74,12 +74,12 @@ export class ReportsService {
     const data = await this.reportsRepository.getModuleWiseReport(financialYear);
 
     return {
-      data: data.map((item) => ({
-        module: item.moduleType,
-        count: item._count,
-        totalVendorCost: Number(item._sum.vendorCost || 0),
-        totalCustomerAmount: Number(item._sum.customerAmount || 0),
-        totalMargin: Number(item._sum.margin || 0),
+      data: data.map((item: any) => ({
+        module: item._id || 'Unknown',
+        count: item.count || 0,
+        totalVendorCost: Number(item.vendorCost || 0),
+        totalCustomerAmount: Number(item.customerAmount || 0),
+        totalMargin: Number(item.margin || 0),
       })),
     };
   }
