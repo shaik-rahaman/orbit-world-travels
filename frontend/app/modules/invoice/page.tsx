@@ -2,8 +2,10 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Card, Button, Table, Pagination, Badge, Modal, Input, Select, FileUpload } from '@/components/shared';
 import { useInvoices, useCreateInvoice, useClients, useVisas, useFlights, useHotels, useInsurance, useUploadInvoiceFile, useUploadVisaFile, useUploadFlightFile, useUploadHotelFile, useUploadInsuranceFile, useAddInvoiceItem } from '@/hooks/useApi';
+import { usePermissions } from '@/hooks/usePermissions';
 import { PAGINATION, INVOICE_STATUSES } from '@/constants';
 import { formatCurrency } from '@/utils/helpers';
 import { Plus, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
@@ -11,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 function InvoiceListContent() {
   const queryClient = useQueryClient();
+  const { canCreate } = usePermissions();
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadMode, setUploadMode] = useState(false);
@@ -304,9 +307,11 @@ function InvoiceListContent() {
           <Button variant="secondary" onClick={() => refetch()} className="flex items-center gap-2">
             <RefreshCw size={20} /> Refresh
           </Button>
-          <Button variant="primary" onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
-            <Plus size={20} /> New Invoice
-          </Button>
+          {canCreate && (
+            <Button variant="primary" onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
+              <Plus size={20} /> New Invoice
+            </Button>
+          )}
         </div>
       </div>
 
@@ -501,5 +506,11 @@ function InvoiceListContent() {
 }
 
 export default function InvoicePage() {
-  return <DashboardLayout><InvoiceListContent /></DashboardLayout>;
+  return (
+    <ProtectedRoute>
+      <DashboardLayout>
+        <InvoiceListContent />
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
 }

@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { CrmController } from './crm.controller';
-import { authMiddleware, validateRequest } from '@/middleware';
+import { authMiddleware, validateRequest, readOnlyMiddleware } from '@/middleware';
 import { createClientSchema, updateClientSchema } from '@/shared/dtos';
 
 const router = Router();
 const crmController = new CrmController();
 
 router.use(authMiddleware);
+router.use(readOnlyMiddleware); // Apply RBAC - block write operations for demo users
 
 router.post(
   '/',

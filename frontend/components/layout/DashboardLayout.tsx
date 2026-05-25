@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar, Topbar } from '@/components/layout/Navigation';
 import { ChatbotPanel } from '@/components/layout/Chatbot';
+import { DemoBanner } from '@/components/shared';
 import { useAuthStore } from '@/store';
 import { useUIStore } from '@/store';
 
@@ -13,8 +14,9 @@ export function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const { sidebarOpen } = useUIStore();
+  const isDemoUser = user?.role === 'DEMO';
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -28,6 +30,7 @@ export function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50">
+      {isDemoUser && <DemoBanner userEmail={user?.email} />}
       <Topbar />
       <Sidebar />
       <main className={`mt-16 transition-all duration-300 p-6 ${sidebarOpen ? 'ml-64' : 'ml-20'}`}>

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card, Button, Table, Pagination, Modal, Input, FileUpload, Select } from '@/components/shared';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';import { ProtectedRoute } from '@/components/auth/ProtectedRoute';import { Card, Button, Table, Pagination, Modal, Input, FileUpload, Select } from '@/components/shared';
 import { useHotels, useCreateHotel, useUploadHotelFile, useClients } from '@/hooks/useApi';
+import { usePermissions } from '@/hooks/usePermissions';
 import { PAGINATION, ROOM_TYPES } from '@/constants';
 import { formatCurrency } from '@/utils/helpers';
 import { Plus, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
@@ -11,6 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 function HotelListContent() {
   const queryClient = useQueryClient();
+  const { canCreate } = usePermissions();
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadMode, setUploadMode] = useState(false);
@@ -152,28 +153,30 @@ function HotelListContent() {
           <Button variant="secondary" onClick={() => refetch()} className="flex items-center gap-2">
             <RefreshCw size={20} /> Refresh
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              setIsModalOpen(true);
-              setUploadMode(false);
-              setFormData({
-                hotelName: '',
-                city: '',
-                roomType: '',
-                guestName: '',
-                checkInDate: '',
-                checkOutDate: '',
-                vendorCost: '',
-                customerAmount: '',
-                clientId: '',
-              });
-              setError('');
-            }}
-            className="flex items-center gap-2"
-          >
-            <Plus size={20} /> New Hotel
-          </Button>
+          {canCreate && (
+            <Button
+              variant="primary"
+              onClick={() => {
+                setIsModalOpen(true);
+                setUploadMode(false);
+                setFormData({
+                  hotelName: '',
+                  city: '',
+                  roomType: '',
+                  guestName: '',
+                  checkInDate: '',
+                  checkOutDate: '',
+                  vendorCost: '',
+                  customerAmount: '',
+                  clientId: '',
+                });
+                setError('');
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus size={20} /> New Hotel
+            </Button>
+          )}
         </div>
       </div>
 
@@ -304,5 +307,11 @@ function HotelListContent() {
 }
 
 export default function HotelPage() {
-  return <DashboardLayout><HotelListContent /></DashboardLayout>;
+  return (
+    <ProtectedRoute>
+      <DashboardLayout>
+        <HotelListContent />
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
 }

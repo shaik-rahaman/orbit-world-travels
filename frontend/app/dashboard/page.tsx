@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Card, StatCard } from '@/components/shared';
 import { useVisas, useFlights, useHotels, useInsurance, useInvoices, useClients } from '@/hooks/useApi';
 import { formatCurrency } from '@/utils/helpers';
@@ -137,8 +138,10 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <DashboardLayout>
-      <DashboardContent />
-    </DashboardLayout>
+    <ProtectedRoute>
+      <DashboardLayout>
+        <DashboardContent />
+      </DashboardLayout>
+    </ProtectedRoute>
   );
 }

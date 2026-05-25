@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { InsuranceController } from './insurance.controller';
-import { authMiddleware, validateRequest } from '@/middleware';
+import { authMiddleware, validateRequest, readOnlyMiddleware } from '@/middleware';
 import { createInsuranceSchema, updateInsuranceSchema } from '@/shared/dtos';
 
 const router = Router();
 const insuranceController = new InsuranceController();
 
 router.use(authMiddleware);
+router.use(readOnlyMiddleware); // Apply RBAC - block write operations for demo users
 
 router.post(
   '/',

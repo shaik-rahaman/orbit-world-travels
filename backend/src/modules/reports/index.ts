@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { ReportsController } from './reports.controller';
-import { authMiddleware } from '@/middleware';
+import { authMiddleware, readOnlyMiddleware } from '@/middleware';
 
 const router = Router();
 const reportsController = new ReportsController();
 
 router.use(authMiddleware);
+router.use(readOnlyMiddleware); // Apply RBAC - enforce read-only access
 
 router.get('/sales', (req, res, next) =>
   reportsController.getSalesReport(req, res, next)

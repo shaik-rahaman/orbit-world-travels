@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { VisaController } from './visa.controller';
-import { authMiddleware, validateRequest } from '@/middleware';
+import { authMiddleware, validateRequest, readOnlyMiddleware } from '@/middleware';
 import { createVisaSchema, updateVisaSchema } from '@/shared/dtos';
 
 const router = Router();
 const visaController = new VisaController();
 
 router.use(authMiddleware);
+router.use(readOnlyMiddleware); // Apply RBAC - block write operations for demo users
 
 router.post(
   '/',

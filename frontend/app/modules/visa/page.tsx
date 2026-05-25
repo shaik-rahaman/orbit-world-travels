@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Card, Button, Table, Pagination, Badge, Modal, Input, Select, FileUpload } from '@/components/shared';
 import { useVisas, useCreateVisa, useUploadVisaFile, useClients } from '@/hooks/useApi';
+import { usePermissions } from '@/hooks/usePermissions';
 import { VISA_TYPES, VISA_STATUSES, PAGINATION } from '@/constants';
 import { formatDate, formatCurrency } from '@/utils/helpers';
 import { Plus, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
@@ -11,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 function VisaListContent() {
   const queryClient = useQueryClient();
+  const { canCreate } = usePermissions();
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadMode, setUploadMode] = useState(false);
@@ -177,27 +180,29 @@ function VisaListContent() {
           <Button variant="secondary" onClick={() => refetch()} className="flex items-center gap-2">
             <RefreshCw size={20} /> Refresh
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              setIsModalOpen(true);
-              setUploadMode(false);
-              setFormData({
-                applicantName: '',
-                country: '',
-                passportNumber: '',
-                visaType: '',
-                vendorCost: '',
-                customerAmount: '',
-                notes: '',
-                clientId: '',
-              });
-              setError('');
-            }}
-            className="flex items-center gap-2"
-          >
-            <Plus size={20} /> New Visa
-          </Button>
+          {canCreate && (
+            <Button
+              variant="primary"
+              onClick={() => {
+                setIsModalOpen(true);
+                setUploadMode(false);
+                setFormData({
+                  applicantName: '',
+                  country: '',
+                  passportNumber: '',
+                  visaType: '',
+                  vendorCost: '',
+                  customerAmount: '',
+                  notes: '',
+                  clientId: '',
+                });
+                setError('');
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus size={20} /> New Visa
+            </Button>
+          )}
         </div>
       </div>
 
@@ -396,8 +401,10 @@ function VisaListContent() {
 
 export default function VisaPage() {
   return (
-    <DashboardLayout>
-      <VisaListContent />
-    </DashboardLayout>
+    <ProtectedRoute>
+      <DashboardLayout>
+        <VisaListContent />
+      </DashboardLayout>
+    </ProtectedRoute>
   );
 }

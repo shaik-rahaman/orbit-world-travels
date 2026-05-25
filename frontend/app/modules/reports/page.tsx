@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Card, StatCard } from '@/components/shared';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, Area, AreaChart } from 'recharts';
 import { BarChart3, TrendingUp, Users, DollarSign, AlertCircle } from 'lucide-react';
@@ -313,5 +314,11 @@ function ReportsContent() {
 }
 
 export default function ReportsPage() {
-  return <DashboardLayout><ReportsContent /></DashboardLayout>;
+  return (
+    <ProtectedRoute>
+      <DashboardLayout>
+        <ReportsContent />
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
 }

@@ -6,17 +6,28 @@ yarn.lock
 dist/
 build/
 
-.env
-.env.local
-.env.*.local
-
-*.log
-
-# Environment
+# Environment variables - CRITICAL for security
 .env
 .env.local
 .env.*.local
 .env.production
+.env.development.local
+.env.test.local
+
+# Test files with hardcoded credentials - DEPRECATED
+test-db*.js
+
+# Private keys
+*.pem
+*.key
+*.pfx
+
+# AWS/Cloud credentials
+.aws/credentials
+.azure/
+.gcp/
+
+*.log
 
 # Build output
 dist/
@@ -47,6 +58,15 @@ pids/
 # Coverage
 coverage/
 .nyc_output/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp/
+tmp/
+*.tmp
 
 # Temporary files
 tmp/

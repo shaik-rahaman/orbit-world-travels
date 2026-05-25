@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Card, Button, Table, Pagination, Badge, Modal, Input, Select, FileUpload } from '@/components/shared';
 import { useInsurance, useCreateInsurance, useUploadInsuranceFile, useClients } from '@/hooks/useApi';
+import { usePermissions } from '@/hooks/usePermissions';
 import { PAGINATION, INSURANCE_TYPES } from '@/constants';
 import { formatCurrency } from '@/utils/helpers';
 import { Plus, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
@@ -11,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 function InsuranceListContent() {
   const queryClient = useQueryClient();
+  const { canCreate } = usePermissions();
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadMode, setUploadMode] = useState(false);
@@ -153,28 +156,30 @@ function InsuranceListContent() {
           <Button variant="secondary" onClick={() => refetch()} className="flex items-center gap-2">
             <RefreshCw size={20} /> Refresh
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              setIsModalOpen(true);
-              setUploadMode(false);
-                setFormData({
-                  policyNumber: '',
-                  insuredName: '',
-                  policyType: '',
-                  coverageAmount: '',
-                  vendorCost: '',
-                  customerAmount: '',
-                  startDate: '',
-                  endDate: '',
-                  clientId: '',
-                });
-              setError('');
-            }}
-            className="flex items-center gap-2"
-          >
-            <Plus size={20} /> New Policy
-          </Button>
+          {canCreate && (
+            <Button
+              variant="primary"
+              onClick={() => {
+                setIsModalOpen(true);
+                setUploadMode(false);
+                  setFormData({
+                    policyNumber: '',
+                    insuredName: '',
+                    policyType: '',
+                    coverageAmount: '',
+                    vendorCost: '',
+                    customerAmount: '',
+                    startDate: '',
+                    endDate: '',
+                    clientId: '',
+                  });
+                setError('');
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus size={20} /> New Policy
+            </Button>
+          )}
         </div>
       </div>
 
@@ -305,5 +310,11 @@ function InsuranceListContent() {
 }
 
 export default function InsurancePage() {
-  return <DashboardLayout><InsuranceListContent /></DashboardLayout>;
+  return (
+    <ProtectedRoute>
+      <DashboardLayout>
+        <InsuranceListContent />
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
 }

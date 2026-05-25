@@ -7,6 +7,7 @@ interface AuthStore {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  hydrated: boolean;
   setUser: (user: User) => void;
   setAccessToken: (token: string) => void;
   login: (user: User, token: string) => void;
@@ -22,6 +23,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  hydrated: false,
 
   setUser: (user) => set({ user }),
   setAccessToken: (token) => {
@@ -52,7 +54,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const userStr = localStorage.getItem('user');
       if (token && userStr) {
         const user = JSON.parse(userStr);
-        set({ accessToken: token, user, isAuthenticated: true });
+        set({ accessToken: token, user, isAuthenticated: true, hydrated: true });
+      } else {
+        set({ hydrated: true });
       }
     }
   },

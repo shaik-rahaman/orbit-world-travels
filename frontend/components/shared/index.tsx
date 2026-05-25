@@ -210,3 +210,4 @@ export function StatCard({ title, value, icon, trend, backgroundColor = 'bg-grad
 export { Table, Pagination };
 export { FileUpload } from './FileUpload';
 export { Toast, ToastContainer } from './Toast';
+export { DemoBanner } from './DemoBanner';

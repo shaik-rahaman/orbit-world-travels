@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { InvoiceController } from './invoice.controller';
-import { authMiddleware, validateRequest, uploadDocumentMiddleware } from '@/middleware';
+import { authMiddleware, validateRequest, uploadDocumentMiddleware, readOnlyMiddleware } from '@/middleware';
 import {
   createInvoiceSchema,
   finalizeInvoiceSchema,
@@ -11,6 +11,7 @@ const invoiceController = new InvoiceController();
 
 // All invoice routes require authentication
 router.use(authMiddleware);
+router.use(readOnlyMiddleware); // Apply RBAC - block write operations for demo users
 
 router.post(
   '/',

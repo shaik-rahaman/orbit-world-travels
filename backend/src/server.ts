@@ -7,12 +7,21 @@ const PORT = config.app.port;
 
 async function startServer() {
   try {
+    // Validate critical environment variables
+    if (!config.database.mongoUri) {
+      const errorMsg = '❌ FATAL: MONGODB_URI is not configured. Set MONGODB_URI in your .env file before starting the application.';
+      console.error(errorMsg);
+      Logger.error(errorMsg);
+      process.exit(1);
+    }
+
     // Connect to MongoDB
     try {
       await connectMongoDB();
+      Logger.info('✓ MongoDB connected successfully');
     } catch (mongoError) {
-      Logger.warn('⚠️ MongoDB connection failed, but continuing with API server', mongoError);
-      // Continue anyway - API can work without DB initially
+      Logger.error('❌ MongoDB connection failed. This is critical for application functionality.', mongoError);
+      process.exit(1);
     }
 
     // Start server

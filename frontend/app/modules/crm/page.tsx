@@ -2,14 +2,17 @@
 
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Card, Button, Table, Pagination, Modal, Input } from '@/components/shared';
 import { useClients, useCreateClient } from '@/hooks/useApi';
+import { usePermissions } from '@/hooks/usePermissions';
 import { PAGINATION } from '@/constants';
 import { Plus, RefreshCw } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 function CRMListContent() {
   const queryClient = useQueryClient();
+  const { canCreate } = usePermissions();
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -55,9 +58,11 @@ function CRMListContent() {
           <h1 className="text-3xl font-bold text-gray-900">CRM - Clients</h1>
           <p className="text-gray-600 mt-1">Manage client relationships and information</p>
         </div>
-        <Button variant="primary" onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
-          <Plus size={20} /> New Client
-        </Button>
+        {canCreate && (
+          <Button variant="primary" onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
+            <Plus size={20} /> New Client
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -91,5 +96,11 @@ function CRMListContent() {
 }
 
 export default function CRMPage() {
-  return <DashboardLayout><CRMListContent /></DashboardLayout>;
+  return (
+    <ProtectedRoute>
+      <DashboardLayout>
+        <CRMListContent />
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
 }

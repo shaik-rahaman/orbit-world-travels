@@ -32,11 +32,12 @@ export function useCurrentUser() {
 }
 
 // User management hooks (admin only)
-export function useUsers(page = 1, limit = 10) {
+export function useUsers(page = 1, limit = 10, enabled = true) {
   return useQuery({
     queryKey: ['USERS', page, limit],
     queryFn: () => apiClient.getAllUsers(page, limit),
     staleTime: 1000 * 60 * 5,
+    enabled: enabled, // Only fetch if enabled (e.g., user is admin)
   });
 }
 

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Card, Button, Input, Select, Badge, Table } from '@/components/shared';
 import { useAuthStore } from '@/store';
 import { useUsers, useCreateUser } from '@/hooks/useApi';
@@ -35,8 +36,8 @@ export default function SettingsPage() {
   const [userError, setUserError] = useState('');
   const [userSuccess, setUserSuccess] = useState('');
 
-  // User management hooks
-  const { data: usersData, isPending: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 100);
+  // User management hooks - only enabled for admin
+  const { data: usersData, isPending: isLoadingUsers, refetch: refetchUsers } = useUsers(1, 100, isAdmin);
   const { mutate: createUser, isPending: isCreatingUser } = useCreateUser();
   
   const { mutate: deleteUserMutation, isPending: isDeletingUser } = useMutation({
@@ -137,11 +138,12 @@ export default function SettingsPage() {
   ];
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600 mt-1">Manage your account preferences and notifications</p>
+    <ProtectedRoute>
+      <DashboardLayout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+            <p className="text-gray-600 mt-1">Manage your account preferences and notifications</p>
         </div>
 
         {/* Account Settings */}
@@ -229,8 +231,8 @@ export default function SettingsPage() {
                     onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value })}
                     options={[
                       { value: 'STAFF', label: 'Staff' },
-                      { value: 'MANAGER', label: 'Manager' },
                       { value: 'ADMIN', label: 'Admin' },
+                      { value: 'DEMO', label: 'Demo (Read-Only)' },
                     ]}
                   />
                   {userError && (
@@ -397,5 +399,6 @@ export default function SettingsPage() {
         )}
       </div>
     </DashboardLayout>
+    </ProtectedRoute>
   );
 }

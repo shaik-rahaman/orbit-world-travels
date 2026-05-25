@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card, Button, Table, Pagination, Badge, Modal, Input, FileUpload, Select } from '@/components/shared';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';import { ProtectedRoute } from '@/components/auth/ProtectedRoute';import { Card, Button, Table, Pagination, Badge, Modal, Input, FileUpload, Select } from '@/components/shared';
 import { useFlights, useCreateFlight, useUploadFlightFile, useClients } from '@/hooks/useApi';
+import { usePermissions } from '@/hooks/usePermissions';
 import { PAGINATION } from '@/constants';
 import { formatDate, formatCurrency } from '@/utils/helpers';
 import { Plus, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
@@ -11,6 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 function FlightListContent() {
   const queryClient = useQueryClient();
+  const { canCreate } = usePermissions();
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadMode, setUploadMode] = useState(false);
@@ -184,29 +185,31 @@ function FlightListContent() {
           <Button variant="secondary" onClick={() => refetch()} className="flex items-center gap-2">
             <RefreshCw size={20} /> Refresh
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              setIsModalOpen(true);
-              setUploadMode(false);
-              setFormData({
-                airline: '',
-                flightNumber: '',
-                pnr: '',
-                sector: '',
-                passengerName: '',
-                departureDate: '',
-                returnDate: '',
-                vendorCost: '',
-                customerAmount: '',
-                clientId: '',
-              });
-              setError('');
-            }}
-            className="flex items-center gap-2"
-          >
-            <Plus size={20} /> New Flight
-          </Button>
+          {canCreate && (
+            <Button
+              variant="primary"
+              onClick={() => {
+                setIsModalOpen(true);
+                setUploadMode(false);
+                setFormData({
+                  airline: '',
+                  flightNumber: '',
+                  pnr: '',
+                  sector: '',
+                  passengerName: '',
+                  departureDate: '',
+                  returnDate: '',
+                  vendorCost: '',
+                  customerAmount: '',
+                  clientId: '',
+                });
+                setError('');
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus size={20} /> New Flight
+            </Button>
+          )}
         </div>
       </div>
 
@@ -389,5 +392,11 @@ function FlightListContent() {
 }
 
 export default function FlightPage() {
-  return <DashboardLayout><FlightListContent /></DashboardLayout>;
+  return (
+    <ProtectedRoute>
+      <DashboardLayout>
+        <FlightListContent />
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
 }

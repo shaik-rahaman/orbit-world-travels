@@ -1,4 +1,12 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
+
+// Validate MONGODB_URI is set
+if (!process.env.MONGODB_URI) {
+  console.error('❌ ERROR: MONGODB_URI environment variable is not set');
+  console.error('   Please add MONGODB_URI to your .env file');
+  process.exit(1);
+}
 
 const invoiceSchema = new mongoose.Schema({
   invoiceNumber: String,
@@ -13,8 +21,8 @@ const Invoice = mongoose.model('Invoice', invoiceSchema);
 
 async function test() {
   try {
-    await mongoose.connect('mongodb+srv://orbitworlddocs_db_user:lsP6rD2ciGdLD7Pe@cluster0.ivxq3sa.mongodb.net/?appName=Cluster0', {
-      dbName: 'orbit_world_db'
+    await mongoose.connect(process.env.MONGODB_URI, {
+      dbName: process.env.DB_NAME || 'orbit_world_db'
     });
     
     const invoiceCount = await Invoice.countDocuments();

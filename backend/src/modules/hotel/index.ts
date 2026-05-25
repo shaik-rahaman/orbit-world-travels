@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { HotelController } from './hotel.controller';
-import { authMiddleware, validateRequest } from '@/middleware';
+import { authMiddleware, validateRequest, readOnlyMiddleware } from '@/middleware';
 import { createHotelSchema, updateHotelSchema } from '@/shared/dtos';
 
 const router = Router();
 const hotelController = new HotelController();
 
 router.use(authMiddleware);
+router.use(readOnlyMiddleware); // Apply RBAC - block write operations for demo users
 
 router.post(
   '/',

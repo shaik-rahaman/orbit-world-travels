@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { FlightController } from './flight.controller';
-import { authMiddleware, validateRequest } from '@/middleware';
+import { authMiddleware, validateRequest, readOnlyMiddleware } from '@/middleware';
 import { createFlightSchema, updateFlightSchema } from '@/shared/dtos';
 
 const router = Router();
 const flightController = new FlightController();
 
 router.use(authMiddleware);
+router.use(readOnlyMiddleware); // Apply RBAC - block write operations for demo users
 
 router.post(
   '/',
